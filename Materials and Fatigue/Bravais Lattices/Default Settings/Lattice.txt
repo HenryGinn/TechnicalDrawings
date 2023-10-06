@@ -1,0 +1,12 @@
+{
+	"size_x": 1,
+	"size_y": 1,
+	"size_z": 1,
+	"angle_xy": 90,
+	"angle_yz": 90,
+	"angle_zx": 90,
+	"length_x": 1,
+	"length_y": 1,
+	"length_z": 1,
+	"type": null
+}
