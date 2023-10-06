@@ -28,44 +28,37 @@ class Lattice():
             {"Cubic": self.set_type_cubic,
              "Orthohombic": self.set_type_orthohombic,
              "Hexagonal": self.set_type_hexagonal,
-             "Trigonal": self.set_type_trigonal,
+             "Tetragonal": self.set_type_tetragonal,
              "Triclininc": self.set_type_triclinic,
              "Monoclinic": self.set_type_monoclinic,
              "Rhombohedral": self.set_type_rhombohedral})
 
     def set_type_cubic(self):
-        self.size_x, self.size_y, self.size_z = 1, 1, 1
         self.angle_xy, self.angle_yz, self.angle_zx = 90, 90, 90
         self.length_x, self.length_y, self.length_z = 1, 1, 1
 
     def set_type_orthohombic(self):
-        self.size_x, self.size_y, self.size_z = 1, 1, 1
         self.angle_xy, self.angle_yz, self.angle_zx = 90, 90, 90
-        self.length_x, self.length_y, self.length_z = 1, 1, 1
+        self.length_x, self.length_y, self.length_z = 1, 1.25, 1.5
 
     def set_type_hexagonal(self):
-        self.size_x, self.size_y, self.size_z = 1, 1, 1
-        self.angle_xy, self.angle_yz, self.angle_zx = 90, 90, 90
-        self.length_x, self.length_y, self.length_z = 1, 1, 1
+        self.angle_xy, self.angle_yz, self.angle_zx = 120, 90, 90
+        self.length_x, self.length_y, self.length_z = 1, 1, 1.5
 
-    def set_type_trigonal(self):
-        self.size_x, self.size_y, self.size_z = 1, 1, 1
+    def set_type_tetragonal(self):
         self.angle_xy, self.angle_yz, self.angle_zx = 90, 90, 90
-        self.length_x, self.length_y, self.length_z = 1, 1, 1
+        self.length_x, self.length_y, self.length_z = 1, 1, 1.5
 
     def set_type_triclinic(self):
-        self.size_x, self.size_y, self.size_z = 1, 1, 1
-        self.angle_xy, self.angle_yz, self.angle_zx = 90, 90, 90
-        self.length_x, self.length_y, self.length_z = 1, 1, 1
+        self.angle_xy, self.angle_yz, self.angle_zx = 70, 75, 80
+        self.length_x, self.length_y, self.length_z = 1, 1.25, 1.5
 
     def set_type_monoclinic(self):
-        self.size_x, self.size_y, self.size_z = 1, 1, 1
-        self.angle_xy, self.angle_yz, self.angle_zx = 90, 90, 90
-        self.length_x, self.length_y, self.length_z = 1, 1, 1
+        self.angle_xy, self.angle_yz, self.angle_zx = 90, 80, 90
+        self.length_x, self.length_y, self.length_z = 1, 1.25, 1.5
 
     def set_type_rhombohedral(self):
-        self.size_x, self.size_y, self.size_z = 1, 1, 1
-        self.angle_xy, self.angle_yz, self.angle_zx = 90, 90, 90
+        self.angle_xy, self.angle_yz, self.angle_zx = 80, 80, 80
         self.length_x, self.length_y, self.length_z = 1, 1, 1
 
     def set_geometry(self):
@@ -201,9 +194,9 @@ class Lattice():
         self.ax.set_axis_off()
 
     def add_primitive(self, **kwargs):
-        self.lines = [Line(self, (0, 0, 0), (1, 0, 0)),
-                      Line(self, (0, 0, 0), (0, 1, 0)),
-                      Line(self, (0, 0, 0), (0, 0, 1))]
+        self.lines = [Line(self, (0, 0, 0), (1, 0, 0), **kwargs),
+                      Line(self, (0, 0, 0), (0, 1, 0), **kwargs),
+                      Line(self, (0, 0, 0), (0, 0, 1), **kwargs)]
 
     def add_base_centred(self, **kwargs):
         self.lines += [Line(self, (0, 0, 0), (1/2, 1/2, 0), **kwargs),

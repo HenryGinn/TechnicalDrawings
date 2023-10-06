@@ -13,8 +13,8 @@ vectors, and all vertices will be generated.
 
 from lattice import Lattice
 
-my_lattice = Lattice(size_x=1)
-my_lattice.add_base_centred(color="blue")
+my_lattice = Lattice(type="Hexagonal")
+#my_lattice.add_base_centred(color="blue")
 #my_lattice.add_body_centred(color="blue")
 #my_lattice.add_face_centred(color="blue")
 my_lattice.draw()
