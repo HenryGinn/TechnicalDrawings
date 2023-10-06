@@ -8,9 +8,19 @@ from hgutilities import defaults
 class Line():
 
     def __init__(self, lattice, start, end, **kwargs):
-        defaults.kwargs(self, kwargs)
+        self.process_kwargs(**kwargs)
         self.lattice = lattice
         self.process_edges(start, end)
+
+    def process_kwargs(self, **kwargs):
+        defaults.kwargs(self, kwargs)
+        self.process_color_kwargs()
+
+    def process_color_kwargs(self):
+        if self.vertex_color is None:
+            self.vertex_color = self.color
+        if self.edge_color is None:
+            self.edge_color = self.color
 
     def process_edges(self, start, end):
         self.start, self.end = start, end
@@ -29,10 +39,13 @@ class Line():
 
     def define_geometry(self):
         self.vertices, self.edges = [], []
+        self.add_vertices_and_edges()
+        self.remove_duplicate_vertices_and_edges()
+
+    def add_vertices_and_edges(self):
         for base_vertex in self.lattice.base_vertices:
             start_point = base_vertex
             self.add_end_points(start_point)
-        self.remove_duplicate_vertices_and_edges()
 
     def add_end_points(self, start_point):
         end_point_1 = start_point + self.direction

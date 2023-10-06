@@ -1,3 +1,10 @@
 {
-	"tol": 0.01
+	"tol": 0.01,
+	"color": "black",
+	"vertex_color": null,
+	"edge_color": null,
+	"vertex_size": 5,
+	"linewidth": 1,
+	"vertex_style": "o",
+	"linestyle": null
 }

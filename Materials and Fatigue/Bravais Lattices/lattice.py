@@ -195,7 +195,7 @@ class Lattice():
         return plane_constant
 
     def create_figure(self):
-        self.fig = plt.figure()
+        self.fig = plt.figure(figsize=plt.figaspect(1))
         self.ax = Axes3D(self.fig, auto_add_to_figure=False)
         self.fig.add_axes(self.ax)
         self.ax.set_axis_off()
@@ -205,33 +205,24 @@ class Lattice():
                       Line(self, (0, 0, 0), (0, 1, 0)),
                       Line(self, (0, 0, 0), (0, 0, 1))]
 
+    def add_line(self, start, end, **kwargs):
+        self.lines.append(Line(self, start, end, **kwargs))
+
     def draw(self):
-        self.collect_facets()
-        self.draw_vertices()
-        self.draw_edges()
+        for line in self.lines:
+            self.draw_vertices(line)
+            self.draw_edges(line)
         plt.show()
 
-    def collect_facets(self):
-        self.collect_vertices()
-        self.collect_edges()
+    def draw_vertices(self, line):
+        for vertex in line.vertices:
+            self.ax.plot(*vertex, color=line.vertex_color,
+                         markersize=line.vertex_size,
+                         marker=line.vertex_style)
 
-    def collect_vertices(self):
-        self.vertices = [vertex for line in self.lines
-                         for vertex in line.vertices]
-        self.vertices = list(set(self.vertices))
-        
-    def collect_edges(self):
-        self.edges = [edge for line in self.lines
-                         for edge in line.edges]
-        self.edges = list(set(self.edges))
-
-    def draw_vertices(self):
-        for vertex in self.vertices:
-            self.ax.plot(*vertex, "ko")
-
-    def draw_edges(self):
-        for edge in self.edges:
-            edge_xyz = list(zip(*edge))
-            self.ax.plot(*edge_xyz, color="black")
-
+    def draw_edges(self, line):
+        for edge in line.edges:
+            self.ax.plot(*zip(*edge), color=line.edge_color,
+                         linewidth=line.linewidth,
+                         linestyle=line.linestyle)
 defaults.load(Lattice)
