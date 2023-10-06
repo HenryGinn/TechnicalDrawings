@@ -29,7 +29,7 @@ class Line():
 
     def define_base_edges(self):
         self.origin = self.get_point_from_parent(*self.start)
-        self.direction = self.get_point_from_parent(*self.end)
+        self.direction = self.get_point_from_parent(*self.end) - self.origin
 
     def get_point_from_parent(self, x, y, z):
         point = (x * self.lattice.base_x +

@@ -12,7 +12,7 @@ class Lattice():
         self.set_geometry()
         self.set_spatial_limits()
         self.create_figure()
-        self.add_primitive_lines()
+        self.add_primitive(**kwargs)
 
     def process_kwargs(self, kwargs):
         defaults.kwargs(self, kwargs)
@@ -200,10 +200,28 @@ class Lattice():
         self.fig.add_axes(self.ax)
         self.ax.set_axis_off()
 
-    def add_primitive_lines(self):
+    def add_primitive(self, **kwargs):
         self.lines = [Line(self, (0, 0, 0), (1, 0, 0)),
                       Line(self, (0, 0, 0), (0, 1, 0)),
                       Line(self, (0, 0, 0), (0, 0, 1))]
+
+    def add_base_centred(self, **kwargs):
+        self.lines += [Line(self, (0, 0, 0), (1/2, 1/2, 0), **kwargs),
+                       Line(self, (1, 0, 0), (1/2, 1/2, 0), **kwargs)]
+
+    def add_body_centred(self, **kwargs):
+        self.lines += [Line(self, (0, 0, 0), (1/2, 1/2, 1/2), **kwargs),
+                       Line(self, (1, 0, 0), (1/2, 1/2, 1/2), **kwargs),
+                       Line(self, (0, 1, 0), (1/2, 1/2, 1/2), **kwargs),
+                       Line(self, (1, 1, 0), (1/2, 1/2, 1/2), **kwargs)]
+
+    def add_face_centred(self, **kwargs):
+        self.lines += [Line(self, (0, 0, 0), (1/2, 1/2, 0), **kwargs),
+                       Line(self, (1, 0, 0), (1/2, 1/2, 0), **kwargs),
+                       Line(self, (0, 0, 0), (0, 1/2, 1/2), **kwargs),
+                       Line(self, (0, 1, 0), (0, 1/2, 1/2), **kwargs),
+                       Line(self, (0, 0, 0), (1/2, 0, 1/2), **kwargs),
+                       Line(self, (0, 0, 1), (1/2, 0, 1/2), **kwargs)]
 
     def add_line(self, start, end, **kwargs):
         self.lines.append(Line(self, start, end, **kwargs))
