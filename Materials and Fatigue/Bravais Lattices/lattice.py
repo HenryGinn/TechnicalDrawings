@@ -220,10 +220,14 @@ class Lattice():
         self.lines.append(Line(self, start, end, **kwargs))
 
     def draw(self):
+        self.draw_lines()
+        self.fix_scaling_and_zoom()
+        plt.show()
+
+    def draw_lines(self):
         for line in self.lines:
             self.draw_vertices(line)
             self.draw_edges(line)
-        plt.show()
 
     def draw_vertices(self, line):
         for vertex in line.vertices:
@@ -236,4 +240,10 @@ class Lattice():
             self.ax.plot(*zip(*edge), color=line.edge_color,
                          linewidth=line.linewidth,
                          linestyle=line.linestyle)
+
+    def fix_scaling_and_zoom(self):
+        scaling = np.array([getattr(self.ax, f"get_{dim}lim")() for dim in 'xyz'])
+        self.ax.auto_scale_xyz(*[[np.min(scaling), np.max(scaling)]]*3)
+        self.ax.set_box_aspect((1, 1, 1), zoom=2)
+        
 defaults.load(Lattice)
