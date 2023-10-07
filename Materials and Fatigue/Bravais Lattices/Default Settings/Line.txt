@@ -1,5 +1,8 @@
 {
 	"tol": 0.01,
+	"line_scaling_x": 1,
+	"line_scaling_y": 1,
+	"line_scaling_z": 1,
 	"color": "black",
 	"vertex_color": null,
 	"edge_color": null,

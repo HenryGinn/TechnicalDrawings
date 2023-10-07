@@ -8,5 +8,6 @@
 	"length_x": 1,
 	"length_y": 1,
 	"length_z": 1,
-	"type": null
+	"type": null,
+	"zoom": 1.5
 }

@@ -44,12 +44,12 @@ class Line():
 
     def add_vertices_and_edges(self):
         for base_vertex in self.lattice.base_vertices:
-            start_point = np.round(base_vertex, 6)
+            start_point = np.round(base_vertex + self.origin, 6)
             self.add_end_points(start_point)
 
     def add_end_points(self, start_point):
-        end_point_1 = start_point + self.direction
-        end_point_2 = start_point - self.direction
+        end_point_1 = np.round(start_point + self.direction, 6)
+        end_point_2 = np.round(start_point - self.direction, 6)
         self.add_point(start_point, end_point_1)
         self.add_point(start_point, end_point_2)
 
@@ -67,19 +67,19 @@ class Line():
         return valid
 
     def valid_point_x(self, point):
-        plane_constant = np.dot(point, self.lattice.normal_x)
+        plane_constant = np.dot(point, self.lattice.normal_x)*self.line_scaling_x
         valid_minimum = (plane_constant >= self.lattice.spatial_x_min - self.tol)
         valid_maximum = (plane_constant <= self.lattice.spatial_x_max + self.tol)
         return (valid_minimum and valid_maximum)
 
     def valid_point_y(self, point):
-        plane_constant = np.dot(point, self.lattice.normal_y)
+        plane_constant = np.dot(point, self.lattice.normal_y)*self.line_scaling_y
         valid_minimum = (plane_constant >= self.lattice.spatial_y_min - self.tol)
         valid_maximum = (plane_constant <= self.lattice.spatial_y_max + self.tol)
         return (valid_minimum and valid_maximum)
 
     def valid_point_z(self, point):
-        plane_constant = np.dot(point, self.lattice.normal_z)
+        plane_constant = np.dot(point, self.lattice.normal_z)*self.line_scaling_z
         valid_minimum = (plane_constant >= self.lattice.spatial_z_min - self.tol)
         valid_maximum = (plane_constant <= self.lattice.spatial_z_max + self.tol)
         return (valid_minimum and valid_maximum)

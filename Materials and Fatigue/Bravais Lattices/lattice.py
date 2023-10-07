@@ -12,7 +12,6 @@ class Lattice():
         self.set_geometry()
         self.set_spatial_limits()
         self.create_figure()
-        self.add_primitive(**kwargs)
 
     def process_kwargs(self, kwargs):
         defaults.kwargs(self, kwargs)
@@ -133,23 +132,23 @@ class Lattice():
         self.base_y = np.array([np.cos(np.pi/180*self.angle_xy),
                                 np.sin(np.pi/180*self.angle_xy), 0])
         self.set_base_z()
-        self.round_basis_vectors()
+        self.adjust_basis_vectors()
 
     def set_base_z(self):
         self.base_z = np.array([np.cos(np.pi/180*self.angle_zx),
                                 np.cos(np.pi/180*self.angle_yz)*np.sin(np.pi/180*self.angle_zx),
                                 np.sin(np.pi/180*self.angle_yz)*np.sin(np.pi/180*self.angle_zx)])
 
-    def round_basis_vectors(self):
-        self.base_x = np.round(self.base_x, 5)
-        self.base_y = np.round(self.base_y, 5)
-        self.base_z = np.round(self.base_z, 5)
+    def adjust_basis_vectors(self):
+        self.base_x = np.round(self.base_x * self.length_x, 5)
+        self.base_y = np.round(self.base_y * self.length_y, 5)
+        self.base_z = np.round(self.base_z * self.length_z, 5)
 
     def set_base_vertices(self):
         self.base_vertices = [self.get_base_vertex(x, y, z)
-                              for x in range(self.x_limit_min, self.x_limit_max + 1)
-                              for y in range(self.y_limit_min, self.y_limit_max + 1)
-                              for z in range(self.z_limit_min, self.z_limit_max + 1)]
+                              for x in range(self.x_limit_min - 1, self.x_limit_max + 2)
+                              for y in range(self.y_limit_min - 1, self.y_limit_max + 2)
+                              for z in range(self.z_limit_min - 1, self.z_limit_max + 2)]
 
     def get_base_vertex(self, x, y, z):
         vertex = (self.origin +
@@ -230,11 +229,25 @@ class Lattice():
         self.current_level += 1
 
     def draw(self):
-        self.order_vertices()
-        self.draw_edges()
-        self.draw_vertices()
+        self.order_geometry()
+        self.draw_geometry()
         self.fix_scaling_and_zoom()
         plt.show()
+
+    def order_geometry(self):
+        self.order_edges()
+        self.order_vertices()
+
+    def order_edges(self):
+        self.edges = {}
+        for line in self.lines:
+            for edge in line.edges:
+                self.process_edge(edge, line)
+
+    def process_edge(self, edge, line):
+        if ((edge not in self.edges)
+            or (self.edges[edge].level > line.level)):
+            self.edges.update({edge: line})
 
     def order_vertices(self):
         self.vertices = {}
@@ -247,15 +260,15 @@ class Lattice():
             or (self.vertices[vertex].level > line.level)):
             self.vertices.update({vertex: line})
 
-    def draw_edges(self):
-        for line in self.lines:
-            for edge in line.edges:
-                self.draw_edge(edge, line)
+    def draw_geometry(self):
+        self.draw_edges()
+        self.draw_vertices()
 
-    def draw_edge(self, edge, line):
-        self.ax.plot(*zip(*edge), color=line.edge_color,
-                     linewidth=line.linewidth,
-                     linestyle=line.linestyle)
+    def draw_edges(self):
+        for edge, line in self.edges.items():
+            self.ax.plot(*zip(*edge), color=line.edge_color,
+                         linewidth=line.linewidth,
+                         linestyle=line.linestyle)
 
     def draw_vertices(self):
         for vertex, line in self.vertices.items():
@@ -266,6 +279,7 @@ class Lattice():
     def fix_scaling_and_zoom(self):
         scaling = np.array([getattr(self.ax, f"get_{dim}lim")() for dim in 'xyz'])
         self.ax.auto_scale_xyz(*[[np.min(scaling), np.max(scaling)]]*3)
-        self.ax.set_box_aspect((1, 1, 1), zoom=2)
+        self.ax.set_box_aspect((1, 1, 1), zoom=self.zoom)
+        self.ax.set_aspect('equal')
         
 defaults.load(Lattice)
