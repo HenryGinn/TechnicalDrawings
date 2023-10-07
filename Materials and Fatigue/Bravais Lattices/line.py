@@ -44,7 +44,7 @@ class Line():
 
     def add_vertices_and_edges(self):
         for base_vertex in self.lattice.base_vertices:
-            start_point = base_vertex
+            start_point = np.round(base_vertex, 6)
             self.add_end_points(start_point)
 
     def add_end_points(self, start_point):

@@ -16,6 +16,8 @@ class Lattice():
 
     def process_kwargs(self, kwargs):
         defaults.kwargs(self, kwargs)
+        self.lines = []
+        self.current_level = 0
         self.set_type()
 
     def set_type(self):
@@ -194,52 +196,72 @@ class Lattice():
         self.ax.set_axis_off()
 
     def add_primitive(self, **kwargs):
-        self.lines = [Line(self, (0, 0, 0), (1, 0, 0), **kwargs),
-                      Line(self, (0, 0, 0), (0, 1, 0), **kwargs),
-                      Line(self, (0, 0, 0), (0, 0, 1), **kwargs)]
+        starts_and_ends = [[(0, 0, 0), (1, 0, 0)],
+                           [(0, 0, 0), (0, 1, 0)],
+                           [(0, 0, 0), (0, 0, 1)]]
+        self.add_lines(starts_and_ends, **kwargs)
 
     def add_base_centred(self, **kwargs):
-        self.lines += [Line(self, (0, 0, 0), (1/2, 1/2, 0), **kwargs),
-                       Line(self, (1, 0, 0), (1/2, 1/2, 0), **kwargs)]
+        starts_and_ends = [[(0, 0, 0), (1/2, 1/2, 0)],
+                           [(1, 0, 0), (1/2, 1/2, 0)]]
+        self.add_lines(starts_and_ends, **kwargs)
 
     def add_body_centred(self, **kwargs):
-        self.lines += [Line(self, (0, 0, 0), (1/2, 1/2, 1/2), **kwargs),
-                       Line(self, (1, 0, 0), (1/2, 1/2, 1/2), **kwargs),
-                       Line(self, (0, 1, 0), (1/2, 1/2, 1/2), **kwargs),
-                       Line(self, (1, 1, 0), (1/2, 1/2, 1/2), **kwargs)]
+        starts_and_ends = [[(0, 0, 0), (1/2, 1/2, 1/2)],
+                           [(0, 0, 0), (1/2, 1/2, 1/2)],
+                           [(0, 1, 0), (1/2, 1/2, 1/2)],
+                           [(1, 1, 0), (1/2, 1/2, 1/2)]]
+        self.add_lines(starts_and_ends, **kwargs)
 
     def add_face_centred(self, **kwargs):
-        self.lines += [Line(self, (0, 0, 0), (1/2, 1/2, 0), **kwargs),
-                       Line(self, (1, 0, 0), (1/2, 1/2, 0), **kwargs),
-                       Line(self, (0, 0, 0), (0, 1/2, 1/2), **kwargs),
-                       Line(self, (0, 1, 0), (0, 1/2, 1/2), **kwargs),
-                       Line(self, (0, 0, 0), (1/2, 0, 1/2), **kwargs),
-                       Line(self, (0, 0, 1), (1/2, 0, 1/2), **kwargs)]
+        starts_and_ends = [[(0, 0, 0), (1/2, 1/2, 0)],
+                           [(1, 0, 0), (1/2, 1/2, 0)],
+                           [(0, 0, 0), (0, 1/2, 1/2)],
+                           [(0, 1, 0), (0, 1/2, 1/2)],
+                           [(0, 0, 0), (1/2, 0, 1/2)],
+                           [(0, 0, 1), (1/2, 0, 1/2)]]
+        self.add_lines(starts_and_ends, **kwargs)
 
-    def add_line(self, start, end, **kwargs):
-        self.lines.append(Line(self, start, end, **kwargs))
+    def add_lines(self, starts_and_ends, **kwargs):
+        for start_and_end in starts_and_ends:
+            start, end = start_and_end
+            self.lines.append(
+                Line(self, start, end, level=self.current_level, **kwargs))
+        self.current_level += 1
 
     def draw(self):
-        self.draw_lines()
+        self.order_vertices()
+        self.draw_edges()
+        self.draw_vertices()
         self.fix_scaling_and_zoom()
         plt.show()
 
-    def draw_lines(self):
+    def order_vertices(self):
+        self.vertices = {}
         for line in self.lines:
-            self.draw_vertices(line)
-            self.draw_edges(line)
+            for vertex in line.vertices:
+                self.process_vertex(vertex, line)
 
-    def draw_vertices(self, line):
-        for vertex in line.vertices:
+    def process_vertex(self, vertex, line):
+        if ((vertex not in self.vertices)
+            or (self.vertices[vertex].level > line.level)):
+            self.vertices.update({vertex: line})
+
+    def draw_edges(self):
+        for line in self.lines:
+            for edge in line.edges:
+                self.draw_edge(edge, line)
+
+    def draw_edge(self, edge, line):
+        self.ax.plot(*zip(*edge), color=line.edge_color,
+                     linewidth=line.linewidth,
+                     linestyle=line.linestyle)
+
+    def draw_vertices(self):
+        for vertex, line in self.vertices.items():
             self.ax.plot(*vertex, color=line.vertex_color,
                          markersize=line.vertex_size,
                          marker=line.vertex_style)
-
-    def draw_edges(self, line):
-        for edge in line.edges:
-            self.ax.plot(*zip(*edge), color=line.edge_color,
-                         linewidth=line.linewidth,
-                         linestyle=line.linestyle)
 
     def fix_scaling_and_zoom(self):
         scaling = np.array([getattr(self.ax, f"get_{dim}lim")() for dim in 'xyz'])
