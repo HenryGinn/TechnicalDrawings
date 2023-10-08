@@ -8,13 +8,24 @@ from hgutilities import defaults
 class Line():
 
     def __init__(self, lattice, start, end, **kwargs):
-        self.process_kwargs(**kwargs)
         self.lattice = lattice
+        self.process_kwargs(**kwargs)
         self.process_edges(start, end)
 
     def process_kwargs(self, **kwargs):
         defaults.kwargs(self, kwargs)
+        self.process_normal_kwargs()
         self.process_color_kwargs()
+
+    def process_normal_kwargs(self):
+        self.normal_x = self.get_normal_combination(*self.normal_x_coefficients)
+        self.normal_y = self.get_normal_combination(*self.normal_y_coefficients)
+        self.normal_z = self.get_normal_combination(*self.normal_z_coefficients)
+
+    def get_normal_combination(self, x, y, z):
+        return (x * self.lattice.normal_x +
+                y * self.lattice.normal_y +
+                z * self.lattice.normal_z)
 
     def process_color_kwargs(self):
         if self.vertex_color is None:
@@ -67,19 +78,19 @@ class Line():
         return valid
 
     def valid_point_x(self, point):
-        plane_constant = np.dot(point, self.lattice.normal_x)*self.line_scaling_x
+        plane_constant = np.dot(point, self.normal_x)*self.line_scaling_x
         valid_minimum = (plane_constant >= self.lattice.spatial_x_min - self.tol)
         valid_maximum = (plane_constant <= self.lattice.spatial_x_max + self.tol)
         return (valid_minimum and valid_maximum)
 
     def valid_point_y(self, point):
-        plane_constant = np.dot(point, self.lattice.normal_y)*self.line_scaling_y
+        plane_constant = np.dot(point, self.normal_y)*self.line_scaling_y
         valid_minimum = (plane_constant >= self.lattice.spatial_y_min - self.tol)
         valid_maximum = (plane_constant <= self.lattice.spatial_y_max + self.tol)
         return (valid_minimum and valid_maximum)
 
     def valid_point_z(self, point):
-        plane_constant = np.dot(point, self.lattice.normal_z)*self.line_scaling_z
+        plane_constant = np.dot(point, self.normal_z)*self.line_scaling_z
         valid_minimum = (plane_constant >= self.lattice.spatial_z_min - self.tol)
         valid_maximum = (plane_constant <= self.lattice.spatial_z_max + self.tol)
         return (valid_minimum and valid_maximum)

@@ -9,5 +9,9 @@
 	"vertex_size": 5,
 	"linewidth": 1,
 	"vertex_style": "o",
-	"linestyle": null
+	"linestyle": null,
+	"normal_x_coefficients": [1, 0, 0],
+	"normal_y_coefficients": [0, 1, 0],
+	"normal_z_coefficients": [0, 0, 1],
+	"suppress_edges": false
 }

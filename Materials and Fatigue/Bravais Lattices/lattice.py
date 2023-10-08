@@ -1,3 +1,5 @@
+import os
+
 from hgutilities import defaults
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,7 +32,7 @@ class Lattice():
              "Orthohombic": self.set_type_orthohombic,
              "Hexagonal": self.set_type_hexagonal,
              "Tetragonal": self.set_type_tetragonal,
-             "Triclininc": self.set_type_triclinic,
+             "Triclinic": self.set_type_triclinic,
              "Monoclinic": self.set_type_monoclinic,
              "Rhombohedral": self.set_type_rhombohedral})
 
@@ -228,11 +230,10 @@ class Lattice():
                 Line(self, start, end, level=self.current_level, **kwargs))
         self.current_level += 1
 
-    def draw(self):
+    def create_lattice(self):
         self.order_geometry()
         self.draw_geometry()
         self.fix_scaling_and_zoom()
-        plt.show()
 
     def order_geometry(self):
         self.order_edges()
@@ -266,9 +267,13 @@ class Lattice():
 
     def draw_edges(self):
         for edge, line in self.edges.items():
-            self.ax.plot(*zip(*edge), color=line.edge_color,
-                         linewidth=line.linewidth,
-                         linestyle=line.linestyle)
+            if line.suppress_edges is False:
+                self.draw_edge(edge, line)
+
+    def draw_edge(self, edge, line):
+        self.ax.plot(*zip(*edge), color=line.edge_color,
+                     linewidth=line.linewidth,
+                     linestyle=line.linestyle)
 
     def draw_vertices(self):
         for vertex, line in self.vertices.items():
@@ -279,7 +284,23 @@ class Lattice():
     def fix_scaling_and_zoom(self):
         scaling = np.array([getattr(self.ax, f"get_{dim}lim")() for dim in 'xyz'])
         self.ax.auto_scale_xyz(*[[np.min(scaling), np.max(scaling)]]*3)
-        self.ax.set_box_aspect((1, 1, 1), zoom=self.zoom)
         self.ax.set_aspect('equal')
+        self.ax.set_box_aspect((1, 1, 1), zoom=self.zoom)
+
+    def add_text(self, coords, text):
+        x_coefficient, y_coefficient, z_coefficient = coords
+        position = (x_coefficient * self.base_x +
+                    y_coefficient * self.base_y +
+                    z_coefficient * self.base_z +
+                    self.origin)
+        self.ax.text(*position, text, size=self.fontsize)
+
+    def show(self):
+        plt.show()
+
+    def save(self, file_name):
+        file_name = os.path.join("Figures", f"{file_name}.{self.format}")
+        plt.savefig(file_name, format=self.format, bbox_inches='tight',
+                    pad_inches=self.pad_inches)
         
 defaults.load(Lattice)
