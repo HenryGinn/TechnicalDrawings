@@ -12,5 +12,6 @@
 	"zoom": 1,
 	"format": "pdf",
 	"pad_inches": -0.5,
-	"fontsize": 25
+	"fontsize": 25,
+	"angle_color": "black"
 }

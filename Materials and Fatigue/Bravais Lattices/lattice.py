@@ -147,17 +147,23 @@ class Lattice():
         self.base_z = np.round(self.base_z * self.length_z, 5)
 
     def set_base_vertices(self):
-        self.base_vertices = [self.get_base_vertex(x, y, z)
+        self.base_vertices = [self.get_position(x, y, z)
                               for x in range(self.x_limit_min - 1, self.x_limit_max + 2)
                               for y in range(self.y_limit_min - 1, self.y_limit_max + 2)
                               for z in range(self.z_limit_min - 1, self.z_limit_max + 2)]
 
-    def get_base_vertex(self, x, y, z):
+    def get_position(self, x, y, z):
         vertex = (self.origin +
                   x * self.base_x +
                   y * self.base_y +
                   z * self.base_z)
         return vertex
+    
+    def get_position_orthonormal_basis(self, x, y, z):
+        x /= self.length_x
+        y /= self.length_y
+        z /= self.length_z
+        return self.get_position(x, y, z)
 
     def set_spatial_limits(self):
         self.set_spatial_limits_x()
@@ -287,13 +293,43 @@ class Lattice():
         self.ax.set_aspect('equal')
         self.ax.set_box_aspect((1, 1, 1), zoom=self.zoom)
 
-    def add_text(self, coords, text):
-        x_coefficient, y_coefficient, z_coefficient = coords
-        position = (x_coefficient * self.base_x +
-                    y_coefficient * self.base_y +
-                    z_coefficient * self.base_z +
-                    self.origin)
+    def add_text(self, coordinates, text):
+        position = self.get_position(*coordinates)
         self.ax.text(*position, text, size=self.fontsize)
+
+    def add_angle(self, point, direction_1, direction_2):
+        position, vector_1, vector_2 = self.get_angle_data(
+            point, direction_1, direction_2)
+        arc_points = self.get_arc_points(position, vector_1, vector_2)
+        self.plot_arc(arc_points)
+
+    def get_angle_data(self, point, direction_1, direction_2):
+        position = self.get_position(*point)
+        vector_1 = self.get_position_orthonormal_basis(*direction_1) - self.origin
+        vector_2 = self.get_position_orthonormal_basis(*direction_2) - self.origin
+        return position, vector_1, vector_2
+
+    def get_arc_points(self, position, vector_1, vector_2):
+        theta = np.linspace(0, np.pi/2, 20)
+        points = ((np.outer(vector_1, np.cos(theta)) + np.outer(vector_2, np.sin(theta))) /
+                  np.sqrt(1 + np.sin(2*theta)*np.dot(vector_1, vector_2))
+                  + np.outer(position, np.ones(20)))
+        return points
+
+    def add_right_angle(self, point, direction_1, direction_2):
+        position, vector_1, vector_2 = self.get_angle_data(
+            point, direction_1, direction_2)
+        arc_points = self.get_right_arc_points(position, vector_1, vector_2)
+        self.plot_arc(arc_points)
+
+    def get_right_arc_points(self, position, vector_1, vector_2):
+        arc_points = np.array([position + vector_1,
+                               position + vector_1 + vector_2,
+                               position + vector_2])
+        return np.transpose(arc_points)
+
+    def plot_arc(self, arc_points):
+        self.ax.plot(*arc_points, color=self.angle_color)
 
     def show(self):
         plt.show()
