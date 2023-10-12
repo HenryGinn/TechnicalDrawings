@@ -45,7 +45,7 @@ class Lattice():
         self.length_x, self.length_y, self.length_z = 1, 1.25, 1.5
 
     def set_type_hexagonal(self):
-        self.angle_xy, self.angle_yz, self.angle_zx = 120, 90, 90
+        self.angle_xy, self.angle_yz, self.angle_zx = 60, 90, 90
         self.length_x, self.length_y, self.length_z = 1, 1, 1.5
 
     def set_type_tetragonal(self):
@@ -201,6 +201,7 @@ class Lattice():
         self.ax = Axes3D(self.fig, auto_add_to_figure=False)
         self.fig.add_axes(self.ax)
         self.ax.set_axis_off()
+        self.ax.view_init(elev=self.elev, azim=self.azim, roll=self.roll)
 
     def add_primitive(self, **kwargs):
         starts_and_ends = [[(0, 0, 0), (1, 0, 0)],

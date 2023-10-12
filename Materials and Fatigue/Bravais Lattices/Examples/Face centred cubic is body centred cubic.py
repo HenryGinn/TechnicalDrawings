@@ -17,4 +17,6 @@ my_lattice.add_lines(base_centred, color="blue", line_scaling_x=1.5,
                             normal_y_coefficients=(-1, 1, 0))
 my_lattice.add_primitive()
 my_lattice.add_face_centred(suppress_edges=True)
-my_lattice.draw()
+
+my_lattice.create_lattice()
+my_lattice.show()

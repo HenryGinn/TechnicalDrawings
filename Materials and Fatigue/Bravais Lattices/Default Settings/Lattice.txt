@@ -13,5 +13,8 @@
 	"format": "pdf",
 	"pad_inches": -0.5,
 	"fontsize": 25,
-	"angle_color": "black"
+	"angle_color": "black",
+	"elev": 30,
+	"azim": -65,
+	"roll": 0
 }
